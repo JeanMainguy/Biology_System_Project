@@ -33,7 +33,7 @@ correlation =cor(expression_table)
 list_correlation = melt(correlation)
 
 #On filtre les résultats de corrélation :
-list_correlation=list_correlation[abs(list_correlation["value"])>0.8,]
+list_correlation=list_correlation[abs(list_correlation["value"])>0.95,]
 
 #On élimine les doublons
 list_correlation["Alphabétique"]<-as.character(list_correlation[,"Var1"])<as.character(list_correlation[,"Var2"])
@@ -44,4 +44,9 @@ colnames(list_correlation) = c("gene1", "gene2")
 #On enregistre dans un fichier
 write.csv(list_correlation, "liste.csv", row.names=F)
 
-
+#sARN 
+#lecture de la table
+interac_table = read.table("sRNA_interaction.txt",header = T)
+#filtrer pour garder seulement les genes d'interet
+interac_table_filter = subset(interac_table, interac_table$CIBLES %in% unlist(list_correlation)) 
+write.csv(interac_table_filter, "liste_sRNA.csv")
