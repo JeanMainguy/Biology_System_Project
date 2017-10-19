@@ -21,6 +21,7 @@ gene_list1 = as.vector(goi_fur1_sorted[,"Gene"])
 gene_list2 = as.vector(goi_fur2_sorted[,"Gene"])
 gene_list3 = as.vector(goi[,"gene"])
 gene_list = c(gene_list1, gene_list2, gene_list3)
+write.table(gene_list, "gene_list.txt", row.names=F, col.names=F, quote=F)
 
 expression_table = subset(expression_table_all, expression_table_all$IDENTIFIER %in% gene_list)
 rownames(expression_table) = expression_table[,"IDENTIFIER"]
@@ -33,7 +34,7 @@ correlation =cor(expression_table)
 list_correlation = melt(correlation)
 
 #On filtre les résultats de corrélation :
-list_correlation=list_correlation[abs(list_correlation["value"])>0.95,]
+list_correlation=list_correlation[abs(list_correlation["value"])>0.99,]
 
 #On élimine les doublons
 list_correlation["Alphabétique"]<-as.character(list_correlation[,"Var1"])<as.character(list_correlation[,"Var2"])
@@ -58,4 +59,4 @@ liste_arn_gene= merge(list_correlation, interac_table_filter, by = intersect(nam
 
 #On enregistre dans un fichier
 
-write.table(liste_arn_gene, "liste95.sif", row.names=F, col.names=F, quote=F)
+write.table(liste_arn_gene, "liste99.sif", row.names=F, col.names=F, quote=F)
