@@ -2,7 +2,7 @@
 
 library("reshape2") ### pour fonction melt dans la correlation
 
-### Ouvrir les 3 fichiers
+### Ouvrir les fichiers
 goi = read.table("GOI.txt", header=F)
 goi_fur1 = read.table("GOI_FUR_1.txt", header=T)
 goi_fur2 = read.table("GOI_FUR_2.txt", header=T)
@@ -38,15 +38,24 @@ list_correlation=list_correlation[abs(list_correlation["value"])>0.95,]
 #On élimine les doublons
 list_correlation["Alphabétique"]<-as.character(list_correlation[,"Var1"])<as.character(list_correlation[,"Var2"])
 list_correlation=list_correlation[list_correlation[,4]==TRUE,]
-list_correlation=list_correlation[,0:2]
-colnames(list_correlation) = c("gene1", "gene2")
+list_correlation=list_correlation[,0:3]
 
-#On enregistre dans un fichier
-write.csv(list_correlation, "liste.csv", row.names=F)
+#Préparation du .sif
+colnames(list_correlation) = c("node1", "node2", "lien")
+list_correlation[,3] = "correlation"
+list_correlation = list_correlation[, c(1,3,2)]
 
-#sARN 
+#Ajout des sRNA
+
 #lecture de la table
 interac_table = read.table("sRNA_interaction.txt",header = T)
 #filtrer pour garder seulement les genes d'interet
-interac_table_filter = subset(interac_table, interac_table$CIBLES %in% unlist(list_correlation)) 
-write.csv(interac_table_filter, "liste_sRNA.csv")
+interac_table_filter = subset(interac_table, interac_table$CIBLES %in% unlist(list_correlation[,1])) 
+interac_table_filter = interac_table_filter[, c(1,3,2)]
+#Fusion des tables
+colnames(interac_table_filter) = c("node1", "lien", "node2")
+liste_arn_gene= merge(list_correlation, interac_table_filter, by = intersect(names(list_correlation), names(interac_table_filter)), all.x = T, all.y = T)
+
+#On enregistre dans un fichier
+
+write.table(liste_arn_gene, "liste95.sif", row.names=F, col.names=F, quote=F)
